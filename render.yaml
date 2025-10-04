@@ -10,8 +10,6 @@ services:
       - key: ASPNETCORE_ENVIRONMENT
         value: Production
       - key: ASPNETCORE_URLS
-        value: http://0.0.0.0:${PORT}
+        value: http://0.0.0.0:$PORT
       - key: ConnectionStrings__DefaultConnection
         value: "Data Source=app.db"
-      - key: Redis__ConnectionString
-        value: "localhost"  # Temporal
