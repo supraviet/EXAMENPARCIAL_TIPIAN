@@ -1,0 +1,90 @@
+@model EXAPARCIALALVARO.Models.Curso
+
+@{
+    ViewData["Title"] = "Detalles del Curso";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="mb-0">@Model.Nombre</h2>
+                </div>
+                <div class="card-body">
+                    <dl class="row">
+                        <dt class="col-sm-3">Código:</dt>
+                        <dd class="col-sm-9">@Model.Codigo</dd>
+
+                        <dt class="col-sm-3">Créditos:</dt>
+                        <dd class="col-sm-9">@Model.Creditos</dd>
+
+                        <dt class="col-sm-3">Cupo:</dt>
+                        <dd class="col-sm-9">
+                            @Model.CupoDisponible / @Model.CupoMaximo disponibles
+                            @if (Model.CupoDisponible <= 5 && Model.CupoDisponible > 0)
+                            {
+                                <span class="badge bg-warning text-dark">Últimos cupos</span>
+                            }
+                        </dd>
+
+                        <dt class="col-sm-3">Horario:</dt>
+                        <dd class="col-sm-9">@Model.HorarioInicio.ToString(@"hh\:mm") - @Model.HorarioFin.ToString(@"hh\:mm")</dd>
+
+                        <dt class="col-sm-3">Estado:</dt>
+                        <dd class="col-sm-9">
+                            @if (Model.Activo)
+                            {
+                                <span class="badge bg-success">Activo</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">Inactivo</span>
+                            }
+                        </dd>
+                    </dl>
+                </div>
+                <div class="card-footer">
+                    <a href="@Url.Action("Index")" class="btn btn-secondary">
+                        ← Volver al Catálogo
+                    </a>
+                    
+                    @if (Model.CupoDisponible > 0 && Model.Activo)
+{
+    <a href="@Url.Action("Inscribir", "Matriculas", new { cursoId = Model.Id })" 
+       class="btn btn-success">
+        Inscribirse en este curso
+    </a>
+}
+                    else if (!Model.Activo)
+                    {
+                        <button class="btn btn-secondary" disabled>Curso Inactivo</button>
+                    }
+                    else
+                    {
+                        <button class="btn btn-secondary" disabled>Cupo Agotado</button>
+                    }
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">Información Rápida</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Matrículas confirmadas:</strong> @Model.Matriculas.Count(m => m.Estado == EstadoMatricula.Confirmada)</p>
+                    <p><strong>Matrículas pendientes:</strong> @Model.Matriculas.Count(m => m.Estado == EstadoMatricula.Pendiente)</p>
+                    
+                    @if (Model.CupoDisponible == 0)
+                    {
+                        <div class="alert alert-warning mt-3">
+                            <small>Este curso ha alcanzado su cupo máximo.</small>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
