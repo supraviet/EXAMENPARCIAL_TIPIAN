@@ -1,0 +1,111 @@
+@{
+    ViewData["Title"] = "Panel de Coordinador";
+    var estadisticas = ViewBag.Estadisticas as dynamic;
+}
+
+<div class="container mt-4">
+    <!-- Botón para volver al inicio -->
+    <div class="mb-4">
+        <a href="@Url.Action("Index", "Home")" class="btn btn-outline-danger">
+            <i class="bi bi-arrow-left"></i> Volver al Inicio
+        </a>
+    </div>
+
+    <h1 class="mb-4">@ViewData["Title"]</h1>
+
+    <!-- Tarjetas de Estadísticas MEJORADAS -->
+    <div class="row mb-5">
+        <div class="col-md-2 mb-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body text-center">
+                    <h4 class="card-title">@estadisticas.TotalCursos</h4>
+                    <p class="card-text mb-0">Total Cursos</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2 mb-3">
+            <div class="card bg-success text-white">
+                <div class="card-body text-center">
+                    <h4 class="card-title">@estadisticas.CursosActivos</h4>
+                    <p class="card-text mb-0">Activos</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2 mb-3">
+            <div class="card bg-secondary text-white">
+                <div class="card-body text-center">
+                    <h4 class="card-title">@estadisticas.CursosInactivos</h4>
+                    <p class="card-text mb-0">Inactivos</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2 mb-3">
+            <div class="card bg-info text-white">
+                <div class="card-body text-center">
+                    <h4 class="card-title">@estadisticas.TotalMatriculas</h4>
+                    <p class="card-text mb-0">Total Matrículas</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2 mb-3">
+            <div class="card bg-warning text-dark">
+                <div class="card-body text-center">
+                    <h4 class="card-title">@estadisticas.MatriculasPendientes</h4>
+                    <p class="card-text mb-0">Pendientes</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2 mb-3">
+            <div class="card bg-danger text-white">
+                <div class="card-body text-center">
+                    <h4 class="card-title">@estadisticas.MatriculasCanceladas</h4>
+                    <p class="card-text mb-0">Canceladas</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Acciones Rápidas -->
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Gestión de Cursos</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="@Url.Action("CrearCurso")" class="btn btn-success">
+                            <i class="bi bi-plus-circle"></i> Crear Nuevo Curso
+                        </a>
+                        <a href="@Url.Action("ListaCursos")" class="btn btn-outline-primary">
+                            <i class="bi bi-list-ul"></i> Ver Todos los Cursos
+                        </a>
+                        <a href="@Url.Action("ListaCursos")#inactivos" class="btn btn-outline-secondary">
+                            <i class="bi bi-eye-slash"></i> Ver Cursos Inactivos (@estadisticas.CursosInactivos)
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">Gestión de Matrículas</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="@Url.Action("Matriculas")" class="btn btn-info text-white">
+                            <i class="bi bi-clipboard-check"></i> Gestionar Matrículas
+                        </a>
+                        <a href="@Url.Action("Matriculas")" class="btn btn-outline-warning">
+                            <i class="bi bi-clock"></i> Ver Pendientes (@estadisticas.MatriculasPendientes)
+                        </a>
+                        <a href="@Url.Action("Matriculas")" class="btn btn-outline-success">
+                            <i class="bi bi-check-lg"></i> Ver Confirmadas (@estadisticas.MatriculasConfirmadas)
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

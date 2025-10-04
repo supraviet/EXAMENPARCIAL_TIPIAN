@@ -1,0 +1,145 @@
+@model IEnumerable<EXAPARCIALALVARO.Models.Matricula>
+
+@{
+    ViewData["Title"] = "Gestión de Matrículas";
+    var cursos = ViewBag.Cursos as List<Curso>;
+    var cursoSeleccionado = ViewBag.CursoSeleccionado as Curso;
+}
+<div class="mb-4">
+    <a href="@Url.Action("Index", "Home")" class="btn btn-outline-danger">
+        <i class="bi bi-arrow-left"></i> Volver al Inicio
+    </a>
+</div>
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>@ViewData["Title"]</h1>
+        @if (cursoSeleccionado != null)
+        {
+            <span class="badge bg-primary fs-6">Curso: @cursoSeleccionado.Nombre</span>
+        }
+    </div>
+
+    <!-- Filtro por Curso -->
+    <div class="card mb-4">
+        <div class="card-header bg-light">
+            <h5 class="mb-0">Filtrar por Curso</h5>
+        </div>
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-8">
+                    <select name="cursoId" class="form-select" onchange="this.form.submit()">
+                        <option value="">-- Todos los cursos --</option>
+                        @if (cursos != null)
+                        {
+                            foreach (var curso in cursos)
+                            {
+                                <option value="@curso.Id" selected="@(cursoSeleccionado?.Id == curso.Id)">
+                                    @curso.Codigo - @curso.Nombre
+                                </option>
+                            }
+                        }
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <a href="@Url.Action("Matriculas")" class="btn btn-outline-secondary">Limpiar Filtro</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Lista de Matrículas -->
+    <div class="card">
+        <div class="card-body">
+            @if (Model.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Estudiante</th>
+                                <th>Curso</th>
+                                <th>Fecha Registro</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var matricula in Model)
+                            {
+                                <tr>
+                                    <td>@(matricula.Usuario != null ? matricula.Usuario.UserName : "Sin usuario")</td>
+                                    <td>
+                                        <strong>@matricula.Curso.Codigo</strong><br>
+                                        <small>@matricula.Curso.Nombre</small>
+                                    </td>
+                                    <td>@matricula.FechaRegistro.ToString("dd/MM/yyyy HH:mm")</td>
+                                    <td>
+                                        <span class="badge @GetBadgeClass(matricula.Estado)">
+                                            @matricula.Estado
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm" role="group">
+                                            @if (matricula.Estado == EstadoMatricula.Pendiente)
+                                            {
+                                                <form asp-action="ConfirmarMatricula" method="post" class="d-inline">
+                                                    <input type="hidden" name="id" value="@matricula.Id" />
+                                                    <button type="submit" class="btn btn-success btn-sm" 
+                                                            title="Confirmar Matrícula"
+                                                            onclick="return confirm('¿Confirmar esta matrícula?')">
+                                                        <i class="bi bi-check-lg"></i> Confirmar
+                                                    </button>
+                                                </form>
+                                            }
+                                            
+                                            @if (matricula.Estado != EstadoMatricula.Cancelada)
+                                            {
+                                                <form asp-action="CancelarMatricula" method="post" class="d-inline">
+                                                    <input type="hidden" name="id" value="@matricula.Id" />
+                                                    <button type="submit" class="btn btn-danger btn-sm" 
+                                                            title="Cancelar Matrícula"
+                                                            onclick="return confirm('¿Cancelar esta matrícula?')">
+                                                        <i class="bi bi-x-lg"></i> Cancelar
+                                                    </button>
+                                                </form>
+                                            }
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info text-center">
+                    <h5>No hay matrículas registradas</h5>
+                    <p class="mb-0">
+                        @if (cursoSeleccionado != null)
+                        {
+                            <span>No hay matrículas para el curso seleccionado.</span>
+                        }
+                        else
+                        {
+                            <span>No se encontraron matrículas.</span>
+                        }
+                    </p>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@functions {
+    string GetBadgeClass(EstadoMatricula estado)
+    {
+        return estado switch
+        {
+            EstadoMatricula.Confirmada => "bg-success",
+            EstadoMatricula.Pendiente => "bg-warning text-dark",
+            EstadoMatricula.Cancelada => "bg-danger",
+            _ => "bg-secondary"
+        };
+    }
+}
