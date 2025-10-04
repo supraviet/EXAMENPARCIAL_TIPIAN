@@ -1,0 +1,118 @@
+@model EXAPARCIALALVARO.Models.CatalogoViewModel
+
+@{
+    ViewData["Title"] = "Catálogo de Cursos";
+}
+<!-- Botón para volver al inicio -->
+<div class="mb-4">
+    <a href="@Url.Action("Index", "Home")" class="btn btn-outline-danger">
+        <i class="bi bi-arrow-left"></i> Volver al Inicio
+    </a>
+</div>
+<div class="container mt-4">
+    <h1 class="mb-4">@ViewData["Title"]</h1>
+
+    <!-- Panel de Filtros -->
+    <div class="card mb-4">
+        <div class="card-header bg-light">
+            <h5 class="mb-0">Filtros de Búsqueda</h5>
+        </div>
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-4">
+                    <label for="Nombre" class="form-label">Nombre o Código</label>
+                    <input type="text" class="form-control" id="Nombre" name="Filtros.Nombre" 
+                           value="@Model.Filtros.Nombre" placeholder="Buscar por nombre o código...">
+                </div>
+                
+                <div class="col-md-2">
+                    <label for="CreditosMin" class="form-label">Créditos Mín</label>
+                    <input type="number" class="form-control" id="CreditosMin" name="Filtros.CreditosMin" 
+                           value="@Model.Filtros.CreditosMin" min="1" max="10" placeholder="Mín">
+                </div>
+                
+                <div class="col-md-2">
+                    <label for="CreditosMax" class="form-label">Créditos Máx</label>
+                    <input type="number" class="form-control" id="CreditosMax" name="Filtros.CreditosMax" 
+                           value="@Model.Filtros.CreditosMax" min="1" max="10" placeholder="Máx">
+                </div>
+                
+                <div class="col-md-2">
+                    <label for="HorarioDesde" class="form-label">Horario Desde</label>
+                    <input type="time" class="form-control" id="HorarioDesde" name="Filtros.HorarioDesde" 
+                           value="@Model.Filtros.HorarioDesde">
+                </div>
+                
+                <div class="col-md-2">
+                    <label for="HorarioHasta" class="form-label">Horario Hasta</label>
+                    <input type="time" class="form-control" id="HorarioHasta" name="Filtros.HorarioHasta" 
+                           value="@Model.Filtros.HorarioHasta">
+                </div>
+                
+                <div class="col-12">
+                    <button type="submit" class="btn btn-primary">Aplicar Filtros</button>
+                    <a href="@Url.Action("Index")" class="btn btn-secondary">Limpiar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Mensajes de Validación -->
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="alert alert-danger">
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        </div>
+    }
+
+    <!-- Lista de Cursos -->
+    <div class="row">
+        @if (Model.Cursos.Any())
+        {
+            foreach (var curso in Model.Cursos)
+            {
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">@curso.Nombre</h5>
+                            <small class="text-muted">Código: @curso.Codigo</small>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text">
+                                <strong>Créditos:</strong> @curso.Creditos<br>
+                                <strong>Cupo:</strong> @curso.CupoDisponible / @curso.CupoMaximo disponibles<br>
+                                <strong>Horario:</strong> @curso.HorarioInicio.ToString(@"hh\:mm") - @curso.HorarioFin.ToString(@"hh\:mm")
+                            </p>
+                        </div>
+                        <div class="card-footer">
+                            <a href="@Url.Action("Details", new { id = curso.Id })" class="btn btn-outline-primary btn-sm">
+                                Ver Detalles
+                            </a>
+                            @if (curso.CupoDisponible > 0)
+                            {
+                                <a href="@Url.Action("Inscribir", "Matriculas", new { cursoId = curso.Id })" 
+                                   class="btn btn-success btn-sm">
+                                    Inscribirse
+                                </a>
+                            }
+                            else
+                            {
+                                <button class="btn btn-secondary btn-sm" disabled>
+                                    Cupo Agotado
+                                </button>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="col-12">
+                <div class="alert alert-info">
+                    No se encontraron cursos que coincidan con los filtros aplicados.
+                </div>
+            </div>
+        }
+    </div>
+</div>
