@@ -1,0 +1,175 @@
+@model IEnumerable<EXAPARCIALALVARO.Models.Curso>
+
+@{
+    ViewData["Title"] = "Gestión de Cursos";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>@ViewData["Title"]</h1>
+        <a href="@Url.Action("CrearCurso")" class="btn btn-success">
+            <i class="bi bi-plus-circle"></i> Nuevo Curso
+        </a>
+    </div>
+<div class="mb-4">
+    <a href="@Url.Action("Index", "Home")" class="btn btn-outline-danger">
+        <i class="bi bi-arrow-left"></i> Volver al Inicio
+    </a>
+</div>
+    <!-- Filtros -->
+    <div class="card mb-4">
+        <div class="card-header bg-light">
+            <h5 class="mb-0">Filtrar Cursos</h5>
+        </div>
+        <div class="card-body">
+            <div class="btn-group" role="group">
+                <a href="@Url.Action("ListaCursos")" class="btn btn-outline-primary">Todos</a>
+                <a href="@Url.Action("ListaCursos")#activos" class="btn btn-outline-success">Activos</a>
+                <a href="@Url.Action("ListaCursos")#inactivos" class="btn btn-outline-secondary">Inactivos</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            @if (Model.Any())
+            {
+                <!-- Cursos Activos -->
+                <div id="activos">
+                    <h5 class="text-success mb-3">
+                        <i class="bi bi-check-circle"></i> Cursos Activos
+                        <span class="badge bg-success">@Model.Count(c => c.Activo)</span>
+                    </h5>
+                    
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead class="table-success">
+                                <tr>
+                                    <th>Código</th>
+                                    <th>Nombre</th>
+                                    <th>Créditos</th>
+                                    <th>Cupo</th>
+                                    <th>Horario</th>
+                                    <th>Matrículas</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var curso in Model.Where(c => c.Activo))
+                                {
+                                    <tr>
+                                        <td><strong>@curso.Codigo</strong></td>
+                                        <td>@curso.Nombre</td>
+                                        <td>@curso.Creditos</td>
+                                        <td>@curso.CupoDisponible / @curso.CupoMaximo</td>
+                                        <td>@curso.HorarioInicio.ToString(@"hh\:mm") - @curso.HorarioFin.ToString(@"hh\:mm")</td>
+                                        <td>
+                                            <span class="badge bg-info">@curso.Matriculas.Count(m => m.Estado == EstadoMatricula.Confirmada) confirmadas</span>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm" role="group">
+                                                <a href="@Url.Action("EditarCurso", new { id = curso.Id })" 
+                                                   class="btn btn-outline-primary" title="Editar">
+                                                    <i class="bi bi-pencil"></i>
+                                                </a>
+                                                <a href="@Url.Action("Matriculas", new { cursoId = curso.Id })" 
+                                                   class="btn btn-outline-info" title="Ver Matrículas">
+                                                    <i class="bi bi-people"></i>
+                                                </a>
+                                                <form asp-action="DesactivarCurso" method="post" class="d-inline">
+                                                    <input type="hidden" name="id" value="@curso.Id" />
+                                                    <button type="submit" class="btn btn-outline-warning" 
+                                                            title="Desactivar" 
+                                                            onclick="return confirm('¿Estás seguro de desactivar este curso?')">
+                                                        <i class="bi bi-eye-slash"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <hr class="my-4">
+
+                <!-- Cursos Inactivos -->
+                <div id="inactivos">
+                    <h5 class="text-secondary mb-3">
+                        <i class="bi bi-eye-slash"></i> Cursos Inactivos
+                        <span class="badge bg-secondary">@Model.Count(c => !c.Activo)</span>
+                    </h5>
+                    
+                    @if (Model.Any(c => !c.Activo))
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead class="table-secondary">
+                                    <tr>
+                                        <th>Código</th>
+                                        <th>Nombre</th>
+                                        <th>Créditos</th>
+                                        <th>Cupo</th>
+                                        <th>Horario</th>
+                                        <th>Matrículas</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var curso in Model.Where(c => !c.Activo))
+                                    {
+                                        <tr>
+                                            <td><strong>@curso.Codigo</strong></td>
+                                            <td>@curso.Nombre</td>
+                                            <td>@curso.Creditos</td>
+                                            <td>@curso.CupoDisponible / @curso.CupoMaximo</td>
+                                            <td>@curso.HorarioInicio.ToString(@"hh\:mm") - @curso.HorarioFin.ToString(@"hh\:mm")</td>
+                                            <td>
+                                                <span class="badge bg-info">@curso.Matriculas.Count(m => m.Estado == EstadoMatricula.Confirmada) confirmadas</span>
+                                            </td>
+                                            <td>
+                                                <div class="btn-group btn-group-sm" role="group">
+                                                    <a href="@Url.Action("EditarCurso", new { id = curso.Id })" 
+                                                       class="btn btn-outline-primary" title="Editar">
+                                                        <i class="bi bi-pencil"></i>
+                                                    </a>
+                                                    <a href="@Url.Action("Matriculas", new { cursoId = curso.Id })" 
+                                                       class="btn btn-outline-info" title="Ver Matrículas">
+                                                        <i class="bi bi-people"></i>
+                                                    </a>
+                                                    <form asp-action="ActivarCurso" method="post" class="d-inline">
+                                                        <input type="hidden" name="id" value="@curso.Id" />
+                                                        <button type="submit" class="btn btn-outline-success" 
+                                                                title="Activar" 
+                                                                onclick="return confirm('¿Estás seguro de activar este curso?')">
+                                                            <i class="bi bi-eye"></i>
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle"></i> No hay cursos inactivos.
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info text-center">
+                    <h5>No hay cursos registrados</h5>
+                    <p class="mb-0">Comienza creando tu primer curso.</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>
