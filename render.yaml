@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: portal-academico
+    env: dotnet
+    plan: free
+    region: oregon
+    buildCommand: dotnet publish -c Release -o output
+    startCommand: cd output && dotnet EXAPARCIALALVARO.dll
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: ASPNETCORE_URLS
+        value: http://0.0.0.0:${PORT}
+      - key: ConnectionStrings__DefaultConnection
+        value: "Data Source=app.db"
+      - key: Redis__ConnectionString
+        value: "localhost"  # Temporal
