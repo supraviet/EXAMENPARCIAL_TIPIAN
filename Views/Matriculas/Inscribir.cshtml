@@ -1,0 +1,111 @@
+@model EXAPARCIALALVARO.Models.InscripcionViewModel
+
+@{
+    ViewData["Title"] = "Inscripción en Curso";
+}
+<!-- Botón para volver al inicio -->
+<div class="mb-4">
+    <a href="@Url.Action("Index", "Home")" class="btn btn-outline-danger">
+        <i class="bi bi-arrow-left"></i> Volver al Inicio
+    </a>
+</div>
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header @(Model.EsExitoso ? "bg-success text-white" : Model.Mensaje != null ? "bg-danger text-white" : "bg-primary text-white")">
+                    <h2 class="mb-0">@ViewData["Title"]</h2>
+                </div>
+                
+                <div class="card-body">
+                    @if (Model.Curso != null)
+                    {
+                        <!-- Información del Curso -->
+                        <div class="mb-4">
+                            <h4>@Model.Curso.Nombre</h4>
+                            <dl class="row">
+                                <dt class="col-sm-3">Código:</dt>
+                                <dd class="col-sm-9">@Model.Curso.Codigo</dd>
+
+                                <dt class="col-sm-3">Créditos:</dt>
+                                <dd class="col-sm-9">@Model.Curso.Creditos</dd>
+
+                                <dt class="col-sm-3">Horario:</dt>
+                                <dd class="col-sm-9">@Model.Curso.HorarioInicio.ToString(@"hh\:mm") - @Model.Curso.HorarioFin.ToString(@"hh\:mm")</dd>
+
+                                <dt class="col-sm-3">Cupo disponible:</dt>
+                                <dd class="col-sm-9">@Model.Curso.CupoDisponible / @Model.Curso.CupoMaximo</dd>
+                            </dl>
+                        </div>
+
+                        <!-- Mensaje de Resultado -->
+                        @if (!string.IsNullOrEmpty(Model.Mensaje))
+                        {
+                            <div class="alert @(Model.EsExitoso ? "alert-success" : "alert-danger")">
+                                <h5 class="alert-heading">
+                                    @if (Model.EsExitoso)
+                                    {
+                                        <i class="bi bi-check-circle-fill"></i>
+                                    }
+                                    else
+                                    {
+                                        <i class="bi bi-exclamation-triangle-fill"></i>
+                                    }
+                                    @Model.Mensaje
+                                </h5>
+                            </div>
+                        }
+
+                        <!-- Formulario de Inscripción (solo si no hay mensaje o es error) -->
+                        @if (string.IsNullOrEmpty(Model.Mensaje) || !Model.EsExitoso)
+                        {
+                            <form asp-action="Inscribir" method="post">
+                                <input type="hidden" name="cursoId" value="@Model.Curso.Id" />
+                                
+                                <div class="alert alert-info">
+                                    <h6 class="alert-heading">Confirmar Inscripción</h6>
+                                    <p class="mb-0">
+                                        Al hacer clic en "Confirmar Inscripción", serás matriculado en este curso 
+                                        en estado <strong>Pendiente</strong>. Un coordinador deberá confirmar tu matrícula.
+                                    </p>
+                                </div>
+
+                                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                    <a href="@Url.Action("Details", "Cursos", new { id = Model.Curso.Id })" 
+                                       class="btn btn-secondary me-md-2">
+                                        <i class="bi bi-arrow-left"></i> Volver al Curso
+                                    </a>
+                                    <button type="submit" class="btn btn-success">
+                                        <i class="bi bi-check-lg"></i> Confirmar Inscripción
+                                    </button>
+                                </div>
+                            </form>
+                        }
+                        else
+                        {
+                            <!-- Botones cuando la inscripción fue exitosa -->
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                <a href="@Url.Action("Index", "Cursos")" class="btn btn-outline-primary me-md-2">
+                                    <i class="bi bi-book"></i> Ver más Cursos
+                                </a>
+                                <a href="@Url.Action("MisMatriculas")" class="btn btn-primary">
+                                    <i class="bi bi-clipboard-check"></i> Ver Mis Matrículas
+                                </a>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="alert alert-warning">
+                            <h5 class="alert-heading">Curso no encontrado</h5>
+                            <p class="mb-0">El curso solicitado no existe o no está disponible.</p>
+                        </div>
+                        <a href="@Url.Action("Index", "Cursos")" class="btn btn-primary">
+                            <i class="bi bi-arrow-left"></i> Volver al Catálogo
+                        </a>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
