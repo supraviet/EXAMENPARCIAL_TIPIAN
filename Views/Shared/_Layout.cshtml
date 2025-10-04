@@ -1,0 +1,140 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Portal Académico</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    
+    <!-- Site CSS -->
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-primary border-bottom box-shadow mb-3">
+            <div class="container">
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
+                    <i class="bi bi-mortarboard-fill"></i>
+                    <strong>Portal Académico</strong>
+                </a>
+                
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    <ul class="navbar-nav flex-grow-1">
+                        <li class="nav-item">
+                            <a class="nav-link text-light" asp-area="" asp-controller="Home" asp-action="Index">
+                                <i class="bi bi-house-door"></i> Inicio
+                            </a>
+                        </li>
+                        
+                        <!-- Catálogo de Cursos SOLO para Estudiantes, NO para Coordinador -->
+                        @if (User.Identity != null && User.Identity.IsAuthenticated && !User.IsInRole("Coordinador"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-light" asp-area="" asp-controller="Cursos" asp-action="Index">
+                                    <i class="bi bi-book"></i> Catálogo de Cursos
+                                </a>
+                            </li>
+                        }
+                        
+                        <!-- Mis Matrículas solo para Estudiantes -->
+                        @if (User.Identity != null && User.Identity.IsAuthenticated && !User.IsInRole("Coordinador"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-light" asp-controller="Matriculas" asp-action="MisMatriculas">
+                                    <i class="bi bi-clipboard-check"></i> Mis Matrículas
+                                </a>
+                            </li>
+                        }
+                        
+                        <!-- Último curso visto solo para Estudiantes -->
+                        @if (Context.Session.GetString("LastVisitedCourse") != null && 
+                             Context.Session.GetInt32("LastVisitedCourseId") != null && 
+                             User.Identity != null && User.Identity.IsAuthenticated && !User.IsInRole("Coordinador"))
+                        {
+                            <div class="navbar-text me-3">
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-clock-history text-warning me-1"></i>
+                                    <small class="text-light me-1">Último visto:</small>
+                                    <a href="@Url.Action("Details", "Cursos", new { id = Context.Session.GetInt32("LastVisitedCourseId") })" 
+                                       class="text-warning text-decoration-underline fw-bold" 
+                                       title="Volver al último curso visitado"
+                                       style="font-size: 0.875rem;">
+                                        @{
+                                            var cursoNombre = Context.Session.GetString("LastVisitedCourse");
+                                            var nombreCorto = !string.IsNullOrEmpty(cursoNombre) && cursoNombre.Length > 20
+                                                ? cursoNombre.Substring(0, 20) + "..."
+                                                : cursoNombre;
+                                        }
+                                        @nombreCorto
+                                    </a>
+                                </div>
+                            </div>
+                        }
+                        
+                        <!-- Panel Coordinador solo visible para coordinadores -->
+                        @if (User.IsInRole("Coordinador"))
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle text-warning" href="#" id="coordinadorDropdown" 
+                                   role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="bi bi-gear"></i> Panel Coordinador
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="coordinadorDropdown">
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Coordinador" asp-action="Index">
+                                            <i class="bi bi-speedometer2"></i> Dashboard
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Coordinador" asp-action="CrearCurso">
+                                            <i class="bi bi-plus-circle"></i> Nuevo Curso
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Coordinador" asp-action="ListaCursos">
+                                            <i class="bi bi-list-ul"></i> Gestionar Cursos
+                                        </a>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Coordinador" asp-action="Matriculas">
+                                            <i class="bi bi-people"></i> Gestionar Matrículas
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                        }
+                    </ul>
+                    
+                    <partial name="_LoginPartial" />
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            &copy; 2024 - Portal Académico - EXAPARCIALALVARO
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
